@@ -14,7 +14,7 @@ export default function ProfileScreen() {
           source={
             userProfile.photoURL
               ? { uri: userProfile.photoURL }
-              : require("../assets/avatar.jpg") // fallback image
+              : require("../assets/avatar.jpg")
           }
           style={styles.avatar}
         />

@@ -21,19 +21,14 @@ export default function SignupScreen({ navigation }) {
   const handleSignup = async () => {
     const auth = getAuth(app);
     try {
-      // Create user but do not automatically sign in
       await createUserWithEmailAndPassword(auth, email, password);
-
-      // Sign out immediately after creating the account to prevent auto-login
       await signOut(auth);
 
-      // Show success message
       alert("You have successfully signed up! Please log in to continue.");
 
-      // Redirect to login screen after signup
-      navigation.navigate("Login"); // Ensure this matches the name of your login screen
+      navigation.navigate("Login");
     } catch (error) {
-      alert(error.message); // Show error message if signup fails
+      alert(error.message);
     }
   };
 

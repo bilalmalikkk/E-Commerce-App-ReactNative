@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import ProductsScreen from "../screens/ProductsScreen";
 import CartScreen from "../screens/CartScreen";
-import ProfileStackNavigator from "./ProfileStackNavigator";
+import PStackNavigator from "./PStackNavigator";
 import { CartContext } from "../CartContext";
 import { ProfileContext } from "../ProfileContext";
 
@@ -82,7 +82,7 @@ export default function AppNavigator() {
         <Tab.Screen name="Cart" component={CartScreen} />
         <Tab.Screen
           name="Profile"
-          component={ProfileStackNavigator}
+          component={PStackNavigator}
           options={{ headerShown: false }}
         />
       </Tab.Navigator>
