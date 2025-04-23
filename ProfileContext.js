@@ -15,6 +15,7 @@ export default function ProfileProvider({ children }) {
     name: "",
     email: "",
     address: "",
+    photoURL: null,
   };
 
   const [userProfile, setUserProfile] = useState(defaultProfile);
@@ -32,7 +33,17 @@ export default function ProfileProvider({ children }) {
       if (firebaseUser) {
         const savedProfile = await AsyncStorage.getItem("userProfile");
         if (savedProfile) {
+          // Load saved profile from AsyncStorage
           setUserProfile(JSON.parse(savedProfile));
+        } else {
+          // If no saved profile, fetch it from Firebase
+          const { displayName, email, photoURL } = firebaseUser;
+          setUserProfile({
+            name: displayName || "Not set",
+            email,
+            address: "Not set", // You can add address fetching from Firestore if needed
+            photoURL: photoURL || null,
+          });
         }
         setIsLoggedIn(true);
       } else {
@@ -101,7 +112,6 @@ export default function ProfileProvider({ children }) {
     }
   };
 
-  // Updated signup function with password validation
   const signup = async (newProfile, password) => {
     if (validateProfile(newProfile)) {
       try {
@@ -110,14 +120,26 @@ export default function ProfileProvider({ children }) {
           throw new Error("Password is required");
         }
 
-        const userCredential = await createUserWithEmailAndPassword(
+        // Create the user but don't automatically sign them in
+        await createUserWithEmailAndPassword(
           auth,
           newProfile.email.trim(),
           password
         );
 
+        // Log the user out immediately after creating the account to prevent automatic login
+        await signOut(auth);
+
+        // Save the new profile to AsyncStorage but don't log the user in
         setUserProfile(newProfile);
         await AsyncStorage.setItem("userProfile", JSON.stringify(newProfile));
+
+        // Show success message
+        alert("You have successfully signed up!");
+
+        // Redirect to the login page after signup
+        // Assuming you are using react-navigation and have a screen named 'Login'
+        navigation.navigate("Login"); // Change "Login" to the actual name of your login screen
       } catch (error) {
         console.error("Signup failed:", error.message);
         if (error.code === "auth/email-already-in-use") {
@@ -134,8 +156,10 @@ export default function ProfileProvider({ children }) {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Clear the AsyncStorage when logging out
+      await AsyncStorage.removeItem("userProfile");
       setIsLoggedIn(false);
-      setUserProfile(defaultProfile);
+      setUserProfile(defaultProfile); // Reset to default profile
     } catch (error) {
       console.error("Logout error:", error.message);
     }

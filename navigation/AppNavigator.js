@@ -1,26 +1,27 @@
-// AppNavigator.js
 import React, { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 import ProductsScreen from "../screens/ProductsScreen";
 import CartScreen from "../screens/CartScreen";
-import ProfileScreen from "../screens/ProfileScreen";
+import ProfileStackNavigator from "./ProfileStackNavigator";
 import { CartContext } from "../CartContext";
-import { Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { ProfileContext } from "../ProfileContext";
 
 const Tab = createBottomTabNavigator();
 
 export default function AppNavigator() {
   const { cartItems } = useContext(CartContext);
+  const { userProfile } = useContext(ProfileContext);
 
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
+        screenOptions={({ route, navigation }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
-
             if (route.name === "Products") iconName = "home-outline";
             else if (route.name === "Cart") iconName = "cart-outline";
             else if (route.name === "Profile") iconName = "person-outline";
@@ -56,11 +57,34 @@ export default function AppNavigator() {
               </View>
             );
           },
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Profile")}
+              style={{ marginRight: 12 }}
+            >
+              <Image
+                source={
+                  userProfile.photoURL
+                    ? { uri: userProfile.photoURL }
+                    : require("../assets/avatar.jpg")
+                }
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                }}
+              />
+            </TouchableOpacity>
+          ),
         })}
       >
         <Tab.Screen name="Products" component={ProductsScreen} />
         <Tab.Screen name="Cart" component={CartScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileStackNavigator}
+          options={{ headerShown: false }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
