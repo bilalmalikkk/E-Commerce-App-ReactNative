@@ -32,12 +32,42 @@ export default function CartProvider({ children }) {
   }, [cartItems]);
 
   const addToCart = (product) => {
-    setCartItems((prevItems) => [...prevItems, product]);
+    setCartItems((prevItems) => {
+      const index = prevItems.findIndex((item) => item.id === product.id);
+      if (index !== -1) {
+        const updatedItems = [...prevItems];
+        updatedItems[index].quantity += 1;
+        return updatedItems;
+      } else {
+        return [...prevItems, { ...product, quantity: 1 }];
+      }
+    });
   };
 
   const removeFromCart = (productId) => {
     setCartItems((prevItems) =>
-      prevItems.filter((item, index) => index !== productId)
+      prevItems.filter((item) => item.id !== productId)
+    );
+  };
+
+  const increaseQuantity = (productId) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (productId) => {
+    setCartItems(
+      (prevItems) =>
+        prevItems
+          .map((item) =>
+            item.id === productId
+              ? { ...item, quantity: item.quantity - 1 }
+              : item
+          )
+          .filter((item) => item.quantity > 0) // Remove item if quantity becomes 0
     );
   };
 
@@ -49,7 +79,9 @@ export default function CartProvider({ children }) {
     cartItems,
     addToCart,
     removeFromCart,
-    clearCart, // now included here
+    clearCart,
+    increaseQuantity, // Added for quantity increment
+    decreaseQuantity, // Added for quantity decrement
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

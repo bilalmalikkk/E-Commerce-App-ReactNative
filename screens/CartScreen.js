@@ -11,10 +11,16 @@ import {
 import { CartContext } from "../CartContext";
 
 export default function CartScreen() {
-  const { cartItems, removeFromCart, clearCart } = useContext(CartContext);
+  const {
+    cartItems,
+    removeFromCart,
+    clearCart,
+    increaseQuantity,
+    decreaseQuantity,
+  } = useContext(CartContext);
 
   const totalPrice = cartItems
-    .reduce((total, item) => total + item.price, 0)
+    .reduce((total, item) => total + item.price * item.quantity, 0) // Now considers quantity
     .toFixed(2);
 
   const handleCheckout = () => {
@@ -32,18 +38,33 @@ export default function CartScreen() {
         <>
           <FlatList
             data={cartItems}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item, index }) => (
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
               <View style={styles.item}>
                 <View style={styles.itemDetails}>
                   <Text style={styles.itemName}>{item.name}</Text>
                   <Text style={styles.itemPrice}>
-                    Rs {item.price.toFixed(2)}
+                    Rs {(item.price * item.quantity).toFixed(2)}{" "}
+                    {/* Price based on quantity */}
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() => removeFromCart(index)}>
-                  <Text style={styles.remove}>Remove</Text>
-                </TouchableOpacity>
+
+                {/* Right side: Remove and Quantity controls */}
+
+                <View style={styles.quantityControls}>
+                  <TouchableOpacity onPress={() => increaseQuantity(item.id)}>
+                    <Text style={styles.qtyBtn}>+</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.qty}>{item.quantity}</Text>
+                  <TouchableOpacity onPress={() => decreaseQuantity(item.id)}>
+                    <Text style={styles.qtyBtn}>-</Text>
+                  </TouchableOpacity>
+                  <View style={styles.actions}>
+                    <TouchableOpacity onPress={() => removeFromCart(item.id)}>
+                      <Text style={styles.remove}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             )}
           />
@@ -105,10 +126,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
   },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   remove: {
     color: "#ff6f61",
     fontWeight: "bold",
     fontSize: 16,
+    marginRight: 12, // Space between Remove and Quantity controls
   },
   total: {
     marginTop: 20,
@@ -125,5 +151,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#333",
+  },
+  quantityControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  qtyBtn: {
+    fontSize: 20,
+    fontWeight: "bold",
+    paddingHorizontal: 12,
+    color: "#ff6f61",
+  },
+  qty: {
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingHorizontal: 8,
   },
 });

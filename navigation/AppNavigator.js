@@ -57,6 +57,8 @@ export default function AppNavigator() {
               </View>
             );
           },
+          tabBarActiveTintColor: "red", // Active icon color (red)
+          tabBarInactiveTintColor: "#888", // Inactive icon color (gray)
           headerRight: () => (
             <TouchableOpacity
               onPress={() => navigation.navigate("Profile")}

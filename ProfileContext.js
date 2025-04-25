@@ -35,9 +35,9 @@ export default function ProfileProvider({ children }) {
         } else {
           const { displayName, email, photoURL } = firebaseUser;
           setUserProfile({
-            name: displayName || "Not set",
+            name: displayName || "",
             email,
-            address: "Not set",
+            address: "",
             photoURL: photoURL || null,
           });
         }
@@ -110,7 +110,6 @@ export default function ProfileProvider({ children }) {
   const signup = async (newProfile, password) => {
     if (validateProfile(newProfile)) {
       try {
-        // Ensure that password is passed correctly
         if (!password || password.trim() === "") {
           throw new Error("Password is required");
         }
@@ -128,7 +127,7 @@ export default function ProfileProvider({ children }) {
 
         alert("You have successfully signed up!");
 
-        navigation.navigate("Login"); // Change "Login" to the actual name of your login screen
+        navigation.navigate("Login");
       } catch (error) {
         console.error("Signup failed:", error.message);
         if (error.code === "auth/email-already-in-use") {
@@ -147,7 +146,7 @@ export default function ProfileProvider({ children }) {
       await signOut(auth);
       await AsyncStorage.removeItem("userProfile");
       setIsLoggedIn(false);
-      setUserProfile(defaultProfile); // Reset to default profile
+      setUserProfile(defaultProfile);
     } catch (error) {
       console.error("Logout error:", error.message);
     }
